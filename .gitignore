@@ -1,0 +1,24 @@
+# Build folders
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Rider files
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Log files
+*.log
