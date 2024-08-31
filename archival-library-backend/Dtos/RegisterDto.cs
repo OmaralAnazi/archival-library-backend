@@ -16,8 +16,8 @@ public class RegisterDto
     [Phone]
     public string PhoneNumber { get; set; }
 
+    // Optimization: Ideally, a custom attribute should be used to validate the date, ensuring it's not in the future, but this will be skipped for now.
     [Required]
-    // TODO: use a better approch, to ensure the date is not in the future for example...
     [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "Please enter a valid date in the format yyyy-MM-dd.")]
     public string Birthdate { get; set; }
 

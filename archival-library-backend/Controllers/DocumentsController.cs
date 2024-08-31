@@ -45,9 +45,8 @@ public class DocumentsController : ControllerBase
     public async Task<IActionResult> UploadDocument([FromForm] UploadDocumentDto uploadDocumentDto, [FromForm] IFormFile file)
     {
         var userId = User.FindFirstValue("userId");
-        var document = await _documentService.UploadDocumentAsync(uploadDocumentDto, file, userId);
-        // TODO: replace with createdAt + ensure the doucment reutned as DTO
-        return Ok(new { Message = "Document uploaded successfully!", Document = document });
+        await _documentService.UploadDocumentAsync(uploadDocumentDto, file, userId);
+        return Created();
     }
 
     [HttpDelete("{id}")]
