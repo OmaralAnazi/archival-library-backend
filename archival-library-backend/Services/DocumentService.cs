@@ -1,0 +1,89 @@
+﻿using archival_library_backend.Dtos;
+using archival_library_backend.Entities;
+using archival_library_backend.Exceptions;
+using archival_library_backend.Interfaces;
+
+namespace archival_library_backend.Services;
+
+public class DocumentService : IDocumentService
+{
+    private readonly IDocumentRepository _documentRepository;
+
+    public DocumentService(IDocumentRepository documentRepository)
+    {
+        _documentRepository = documentRepository;
+    }
+
+    public async Task<List<DocumentDto>> GetAllDocumentDtosAsync()
+    {
+        var documents = await _documentRepository.GetAllDocumentsAsync();
+
+        var documentDtos = documents.Select(doc => new DocumentDto
+        {
+            Id = doc.Id,
+            Title = doc.Title,
+            Description = doc.Description,
+            CategoryName = doc.Category?.Name ?? "Uncategorized", 
+            authorName = $"{doc.AppUser?.FirstName} {doc.AppUser?.LastName}", 
+            PublicationDate = doc.PublicationDate
+        }).ToList();
+
+        return documentDtos;
+    }
+
+    public async Task<List<DocumentDto>> GetAllUserDocumentDtosAsync(string userId)
+    {
+        var documents = await _documentRepository.GetAllUserDocumentsAsync(userId);
+
+        var documentDtos = documents.Select(doc => new DocumentDto
+        {
+            Id = doc.Id,
+            Title = doc.Title,
+            Description = doc.Description,
+            CategoryName = doc.Category?.Name ?? "Uncategorized",
+            authorName = $"{doc.AppUser?.FirstName} {doc.AppUser?.LastName}",
+            PublicationDate = doc.PublicationDate
+        }).ToList();
+
+        return documentDtos;
+    }
+
+    public async Task<DocumentMetadata> UploadDocumentAsync(UploadDocumentDto uploadDocumentDto, IFormFile file, string userId)
+    {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        if (!Directory.Exists(uploadsFolder))
+        {
+            Directory.CreateDirectory(uploadsFolder);
+        }
+
+        var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+        var fullFilePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (var stream = new FileStream(fullFilePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        var document = new DocumentMetadata
+        {
+            Title = uploadDocumentDto.Title,
+            Description = uploadDocumentDto.Description,
+            CategoryId = uploadDocumentDto.CategoryId,
+            FilePath = fullFilePath,
+            AppUserId = userId,
+        };
+
+        return await _documentRepository.AddDocumentAsync(document);
+    }
+
+    public async Task DeleteDocumentAsync(int id, string userId)
+    {
+        var exists = await _documentRepository.IsExistsAsync(id);
+        if (!exists) throw new NotFoundException("Document is not found");
+
+        var ownedBy = await _documentRepository.IsOwnedByAsync(id, userId);
+        if (!ownedBy) throw new ForbiddenException("This is not your document");
+
+        await _documentRepository.DeleteDocumentAsync(id);
+    }
+}

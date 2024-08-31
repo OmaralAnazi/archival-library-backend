@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using archival_library_backend.Data;
@@ -11,9 +12,11 @@ using archival_library_backend.Data;
 namespace archival_library_backend.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240831065519_UpdateEntitiesMigration")]
+    partial class UpdateEntitiesMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,43 +245,6 @@ namespace archival_library_backend.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Category");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "History"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Science and Technology"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Art and Culture"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Education and Research"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Preservation and Conservation"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Legal and Government"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Personal Collections"
-                        });
                 });
 
             modelBuilder.Entity("archival_library_backend.Entities.DocumentMetadata", b =>

@@ -1,6 +1,8 @@
 using archival_library_backend.Data;
 using archival_library_backend.Entities;
 using archival_library_backend.Interfaces;
+using archival_library_backend.Middlewares;
+using archival_library_backend.Repositories;
 using archival_library_backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -91,13 +93,15 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 var app = builder.Build();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowAll"); // For easier testing since it's a simple assessment project
 
 if (app.Environment.IsDevelopment())
 {
@@ -106,6 +110,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication(); 
 app.UseAuthorization();

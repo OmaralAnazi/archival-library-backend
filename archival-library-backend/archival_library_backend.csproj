@@ -27,8 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Mappers\" />
-    <Folder Include="Middlewares\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>
