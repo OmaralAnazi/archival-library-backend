@@ -26,11 +26,18 @@ public class DocumentsController : ControllerBase
 
     [HttpGet("my")]
     [Authorize]
-    public async Task<IActionResult> GetADocumentsForUser()
+    public async Task<IActionResult> GetDocumentsForUser()
     {
         var userId = User.FindFirstValue("userId");
         var documents = await _documentService.GetAllUserDocumentDtosAsync(userId);
         return Ok(documents);
+    }
+
+    [HttpGet("view/{id}")]
+    public async Task<IActionResult> ViewDocument(int id)
+    {
+        var result = await _documentService.GetDocumentFileForViewAsync(id);
+        return result;
     }
 
     [HttpPost("upload")]

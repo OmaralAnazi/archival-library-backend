@@ -2,6 +2,8 @@
 using archival_library_backend.Entities;
 using archival_library_backend.Exceptions;
 using archival_library_backend.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace archival_library_backend.Services;
 
@@ -48,6 +50,40 @@ public class DocumentService : IDocumentService
         return documentDtos;
     }
 
+    public async Task<FileStreamResult> GetDocumentFileForViewAsync(int id)
+    {
+        var document = await _documentRepository.GetDocumentByIdAsync(id);
+        if (document == null)
+            throw new NotFoundException("Document not found.");
+
+        var filePath = document.FilePath;
+
+        if (!System.IO.File.Exists(filePath))
+            throw new NotFoundException("File not found on the server.");
+
+        // Determine the MIME type of the file
+        var provider = new FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(filePath, out var contentType))
+        {
+            contentType = "application/octet-stream"; // default if type is unknown
+        }
+
+        // Open file stream to be returned
+        var fileStream = System.IO.File.OpenRead(filePath);
+
+        // Set the content disposition to 'inline' to display the file in the browser
+        var result = new FileStreamResult(fileStream, contentType)
+        {
+            FileDownloadName = Path.GetFileName(filePath),
+            // Ensure the file is displayed in the browser rather than downloaded
+            EnableRangeProcessing = true // Allows seeking, useful for media files
+        };
+
+        result.FileDownloadName = null; // Optional: don't suggest a filename when viewing
+
+        return result;
+    }
+
     public async Task<DocumentMetadata> UploadDocumentAsync(UploadDocumentDto uploadDocumentDto, IFormFile file, string userId)
     {
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
@@ -86,4 +122,5 @@ public class DocumentService : IDocumentService
 
         await _documentRepository.DeleteDocumentAsync(id);
     }
+
 }

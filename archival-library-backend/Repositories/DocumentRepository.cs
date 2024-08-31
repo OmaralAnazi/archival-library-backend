@@ -22,6 +22,11 @@ public class DocumentRepository : IDocumentRepository
             .ToListAsync();
     }
 
+    public async Task<DocumentMetadata?> GetDocumentByIdAsync(int id)
+    {
+        return await _context.DocumentMetadatas.FirstOrDefaultAsync(d => d.Id == id);
+    }
+
     public async Task<List<DocumentMetadata>> GetAllUserDocumentsAsync(string userId)
     {
         return await _context.DocumentMetadatas
