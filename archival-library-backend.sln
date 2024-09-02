@@ -7,7 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "archival_library_backend", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{50D25887-C4E2-4E39-AE10-D8BD4B39319C}"
 	ProjectSection(SolutionItems) = preProject
-		.env = .env
 		.env.development = .env.development
 		.env.example = .env.example
 		.env.production = .env.production

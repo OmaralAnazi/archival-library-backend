@@ -1,6 +1,8 @@
+using archival_library_backend.Data;
 using archival_library_backend.Middlewares;
 using archival_library_backend.Startup;
 using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,13 +36,17 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+// Apply any pending migrations automatically
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 app.UseCors("AllowAll"); // For easier testing since it's a simple assessment project
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
