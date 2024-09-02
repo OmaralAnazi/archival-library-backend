@@ -4,16 +4,19 @@ using archival_library_backend.Exceptions;
 using archival_library_backend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Configuration;
 
 namespace archival_library_backend.Services;
 
 public class DocumentService : IDocumentService
 {
     private readonly IDocumentRepository _documentRepository;
+    private readonly IConfiguration _configuration;
 
-    public DocumentService(IDocumentRepository documentRepository)
+    public DocumentService(IDocumentRepository documentRepository, IConfiguration configuration)
     {
         _documentRepository = documentRepository;
+        _configuration = configuration;
     }
 
     public async Task<List<DocumentDto>> GetAllDocumentDtosAsync()
@@ -86,7 +89,9 @@ public class DocumentService : IDocumentService
 
     public async Task<DocumentMetadata> UploadDocumentAsync(UploadDocumentDto uploadDocumentDto, IFormFile file, string userId)
     {
-        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        var configuredPath = _configuration["FileStorage:UploadPath"] ?? "uploads/default"; // Default if not set
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), configuredPath);
+
         if (!Directory.Exists(uploadsFolder))
         {
             Directory.CreateDirectory(uploadsFolder);
