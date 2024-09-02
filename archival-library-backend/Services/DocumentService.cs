@@ -114,11 +114,23 @@ public class DocumentService : IDocumentService
 
     public async Task DeleteDocumentAsync(int id, string userId)
     {
-        var exists = await _documentRepository.IsExistsAsync(id);
-        if (!exists) throw new NotFoundException("Document is not found");
+        var document  = await _documentRepository.GetDocumentByIdAsync(id);
+        if (document == null) throw new NotFoundException("Document is not found");
 
         var ownedBy = await _documentRepository.IsOwnedByAsync(id, userId);
         if (!ownedBy) throw new ForbiddenException("This is not your document");
+
+        if (System.IO.File.Exists(document.FilePath))
+        {
+            try
+            {
+                System.IO.File.Delete(document.FilePath);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting the file.");
+            }
+        }
 
         await _documentRepository.DeleteDocumentAsync(id);
     }
