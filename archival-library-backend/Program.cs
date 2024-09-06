@@ -36,6 +36,10 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+var runningInDocker = Environment.GetEnvironmentVariable("RUNNING_IN_DOCKER") == "true";
+if (runningInDocker)
+    app.Urls.Add("http://*:80"); // To make the application listen on all network interfaces (for docker only)
+
 // Apply any pending migrations automatically
 using (var scope = app.Services.CreateScope())
 {
