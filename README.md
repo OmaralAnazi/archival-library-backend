@@ -62,33 +62,62 @@ This backend service, built with .NET, facilitates the uploading, cataloging, an
 
    ```
 
-4. To configure your production environment, create a `.env.production` file in the root directory of your solution. Add the necessary environment variables, such as the connection string to your database. Ensure the database exists and the specified user has appropriate permissions. You can also create a `.env.development` file for your development environment. Use This Template for any of your `.env` files:
+4. To configure your production environment, create a `.env.production` file in the root directory of your solution. Add the necessary environment variables, such as the database, JWT, etc. Ensure the database exists and the specified user has appropriate permissions. You can also create a `.env.development` file for your development environment. Use This Template for any of your `.env` files:
 
    ```bash
-    # Connection string
-    ConnectionStrings__DefaultConnection=...
-
+    # Environment (e.g., Development or Production)
+    ASPNETCORE_ENVIRONMENT=...
+    
     # JWT configuration
     JWT__Issuer=...
     JWT__Audience=...
     JWT__SigningKey=...
-
+    
     # File upload path
     FileStorage__UploadPath=...
-
+    
+    # PostgreSQL Environment Variables
+    POSTGRES_USER=...
+    POSTGRES_PASSWORD=...
+    POSTGRES_DB=...
+    
+    # Connection String (Don't modify it)
+    ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    
+    # Local testing configuration (Don't modify it)
+    RUNNING_IN_DOCKER=false
    ```
 
-5. Run the application (Ctrl + F5):
+5. Run the application locally (Ctrl + F5):
 
    Production:
 
    ```bash
-   dotnet run --launch-profile "https (prod)"
+   dotnet run --launch-profile "http (prod)"
    ```
 
    Or Development:
 
    ```bash
-   dotnet run --launch-profile "https (dev)"
+   dotnet run --launch-profile "http (dev)"
 
    ```
+      *Note: You can access the Swagger documentation by navigating to the following URL in your browser (ensure the app is running):
+   http://localhost:5183/swagger/index.html*
+
+6. Running the application using Docker (Optional), ensure you're in the solution-level directory:
+
+   Production:
+
+   ```bash
+   docker-compose --env-file .env.production up --build
+   ```
+
+   Or Development:
+
+   ```bash
+   docker-compose --env-file .env.development up --build
+   ```
+   
+   *Note: You can access the Swagger documentation for the Dockerized project by navigating to the following URL in your browser (ensure the container is running):
+   http://localhost:5000/swagger/index.html*
